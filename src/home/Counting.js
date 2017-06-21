@@ -2,7 +2,6 @@ import React from 'react'
 class Counting extends React.Component {
     constructor(props) {
         super()
-        // this.timer 
         this.state = {
             count: props.start,
         }
@@ -20,7 +19,7 @@ class Counting extends React.Component {
                 this.setState({
                     count: this.state.count + 1,
                 })
-            }, 1)
+            }, 1000)
         }
     }
     componentDidMount() {
@@ -29,7 +28,7 @@ class Counting extends React.Component {
                 this.setState({
                     count: this.state.count + 1,
                 })
-            }, 1)
+            }, 1000)
         }
     }
     componentWillUnmount() {

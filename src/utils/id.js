@@ -6,3 +6,6 @@ export function getShortID() {
 export function getTimestamp(){
     return new Date().getTime()
 }
+export function toSecs(t){
+    return Math.round(t / 1000);
+}

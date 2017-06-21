@@ -2,7 +2,7 @@ import { Map, fromJS } from 'immutable'
 // initial state
 export default fromJS({
     app: {
-        last_action_at: "1497861374800",
+        last_action_at: "1497928964586",
         counting_record_id: "rywPU6EQZ",
     },
     user: {
@@ -22,10 +22,10 @@ export default fromJS({
         //     field1,
         //     field2,
         // },
-        date: "2017/6/19",
+        date: "2017/6/20",
         // update_at,
     },
-    tasks: [{
+    tasks: {'H1HDUpVQb':{
         // custom: {
         //     ref_id,
         //     memo,
@@ -35,7 +35,7 @@ export default fromJS({
         id: 'H1HDUpVQb',
         name: "task1",
         // update_at,
-    }, {
+    }, 'H1HDUpVQ2':{
         // custom: {
         //     ref_id,
         //     memo,
@@ -43,9 +43,12 @@ export default fromJS({
         //     field2,
         // },
         id: 'H1HDUpVQ2',
-        name: "task1",
+        name: "task2",
         // update_at,
-    }],
+    },'H1HDUpVQ3':{
+        id: 'H1HDUpVQ3',
+        name: "task3",
+    }},
     records: [{
         // custom: {
         //     ref_id,
@@ -53,19 +56,8 @@ export default fromJS({
         //     field1,
         //     field2,
         // },
-        ref_task: {
-            // custom: {
-            //     ref_id,
-            //     memo,
-            //     field1,
-            //     field2,
-            // },
-            id: 'H1HDUpVQb',
-            name: "task1",
-            // update_at,
-        },
         id: 'rywPU6EQZ',
-        date: "2017/6/19",
+        date: "2017/6/20",
         ref_task_id: 'H1HDUpVQb',
         duration: 20,
         // intervals:[{
@@ -79,19 +71,8 @@ export default fromJS({
         //     field1,
         //     field2,
         // },
-        ref_task: {
-            // custom: {
-            //     ref_id,
-            //     memo,
-            //     field1,
-            //     field2,
-            // },
-            id: 'H1HDUpVQ2',
-            name: "task2",
-            // update_at,
-        },
         id: 'rywPU6EQ2',
-        date: "2017/6/19",
+        date: "2017/6/20",
         ref_task_id: 'H1HDUpVQ2',
         duration: 10,
         // intervals:[{

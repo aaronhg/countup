@@ -1,56 +1,64 @@
 import React from 'react'
 import Counting from './Counting'
 import FontIcon from 'material-ui/FontIcon'
-import { getShortID, getTimestamp } from '../utils/id'
+import { getTimestamp ,toSecs} from '../utils/id'
 
 class Task extends React.Component {
-    constructor(){
+    constructor() {
         super()
         this.stop = this.stop.bind(this)
         this.done = this.done.bind(this)
         this.play = this.play.bind(this)
     }
-    stop(){
+    stop() {
         this.props.doOperating({
-            counting_record_id :"",
-            last_action_at : getTimestamp()
+            counting_record_id: "",
+            last_action_at: getTimestamp()
         })
     }
-    done(){
+    done() {
         this.props.doOperating({
-            counting_record_id :"",
-            last_action_at : getTimestamp(),
-            done:true,
+            counting_record_id: "",
+            last_action_at: getTimestamp(),
+            done: true,
         })
     }
-    play(){
+    play() {
         this.props.doOperating({
-            counting_record_id :this.props.record.id,
-            last_action_at : getTimestamp()
+            counting_record_id: this.props.record.get("id"),
+            last_action_at: getTimestamp()
         })
     }
     render() {
-        let { record } = this.props
-        let isCounting = record.id == this.props.counting_record_id
-        let diff = isCounting ? new Date().getTime() - this.props.last_action_at : 0
-        return (<div>
-            <FontIcon className="material-icons" >comment</FontIcon>
-            {record.ref_task.name}
-            <br />
-            <FontIcon className="material-icons" >chat_bubble_outline</FontIcon>
-            <Counting start={record.duration+diff} do={isCounting} />
-            <FontIcon className="material-icons" >format_line_spacing</FontIcon>
-            <br />
-            {isCounting?
-            <div>
-                <FontIcon className="material-icons" onClick={this.stop}>pause_circle_outline</FontIcon>
-                <FontIcon className="material-icons" onClick={this.done}>done</FontIcon>
-            </div>
-            :
-            <div>
-                <FontIcon className="material-icons" onClick={this.play}>play_circle_outline</FontIcon>
-            </div>
-            }
+        let { record, app, task } = this.props
+        let isCounting = record.get("id") == this.props.app.get("counting_record_id")
+        let diff = toSecs(getTimestamp()) - toSecs(this.props.app.get("last_action_at"))
+        if (this.props.type=="mini")
+            return (<div>
+                    <Counting start={(record.get("duration") || 0) + (isCounting ?diff:0)} do={isCounting} />
+                    {isCounting ? <FontIcon className="material-icons" onClick={this.stop}>pause_circle_outline</FontIcon> :<FontIcon className="material-icons" onClick={this.play}>play_circle_outline</FontIcon>}
+                    {task.get("name")}
+                    </div>
+                    )
+        else 
+            return (
+                <div>
+                <FontIcon className="material-icons" >comment</FontIcon>
+                {task.get("name")}
+                <br />
+                <FontIcon className="material-icons" >chat_bubble_outline</FontIcon>
+                <Counting start={(record.get("duration") || 0) +  (isCounting ?diff:0)} do={isCounting} />
+                <br />
+                {isCounting ?
+                    <div>
+                        <FontIcon className="material-icons" onClick={this.stop}>pause_circle_outline</FontIcon>
+                        <FontIcon className="material-icons" onClick={this.done}>done</FontIcon>
+                    </div>
+                    :
+                    <div>
+                        <FontIcon className="material-icons" onClick={this.play}>play_circle_outline</FontIcon>
+                    </div>
+                }
         </div>)
     }
 }
