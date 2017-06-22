@@ -13,7 +13,7 @@ export default fromJS({
         //     field2,
         // },
         working_start_at: 8,
-        working_duration: 9,
+        working_end_at: 17,
         // update_at,
     },
     date: {

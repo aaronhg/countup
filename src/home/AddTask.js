@@ -1,6 +1,7 @@
 import React from 'react'
 import TimeButtor from './TimeButtor'
 import { toSecs, getTimestamp, getShortID } from '../utils/id'
+import moment from 'moment'
 const styles = {
     "position": "absolute",
     zIndex: "2",
@@ -26,7 +27,7 @@ class AddTask extends React.Component {
             taskId :getShortID(),
             recordId : getShortID(),
             recordRefId : this.state.recordRefId,
-            date : "2017/6/21", // todo
+            date : this.props.date,
             update_at : getTimestamp(),
         })
         this.props.onCancel()
@@ -39,7 +40,7 @@ class AddTask extends React.Component {
     render() {
         let { tasks, records } = this.props
         let { task } = this.state
-        let taskids = records.map(r => r.get("ref_task_id"))
+        let taskids = records.map(r => r.get("ref_task_id")) || []
         return (<div style={styles}>
             {tasks.filter(t => taskids.indexOf(t.get("id")) == -1).map(t =>
                 <div key={t.get("id")} onClick={() => this.handleCheckTask(t)}>{t.get("name")}</div>
@@ -54,7 +55,7 @@ class AddTask extends React.Component {
                 </div>
             }
             rRefId:<input value={this.state.recordRefId} onChange={(e) => this.setState({ recordRefId: e.target.value })} /><br />
-            <a onClick={this.handleAdd}>(add)</a>
+            <a onClick={this.handleAdd}>(addtask)</a>
             <a onClick={this.props.onCancel}>(cancel)</a>
         </div>)
     }

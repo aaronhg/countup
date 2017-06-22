@@ -1,12 +1,19 @@
 import { Map, fromJS } from 'immutable'
 import { toSecs } from '../utils/id'
 // contants
-export const REDISTRIBUTION_COMPLETE = "REDISTRIBUTION_COMPLETE"
-export const SAVE_RECORD = "SAVE_RECORD"
-export const OPERATING = "OPERATING"
+const REDISTRIBUTION_COMPLETE = "REDISTRIBUTION_COMPLETE"
+const SAVE_RECORD = "SAVE_RECORD"
+const OPERATING = "OPERATING"
+const CHANGE_DATE = "CHANGE_DATE"
 // reducer
 var opReducer = (state, action) => {
     switch (action.type) {
+        case CHANGE_DATE:
+            debugger
+            var { date } = action.payload
+            return state.set("date", fromJS({
+                date,
+            })).set("records", fromJS([]))
         case SAVE_RECORD:
             var records = state.get("records")
             let { record } = action.payload
@@ -36,10 +43,10 @@ var opReducer = (state, action) => {
             state = state.set("records", records)
             return state
         case REDISTRIBUTION_COMPLETE:
-            var { operate,counts } = action.payload.data
-            var { last_action_at, counting_record_id } = operate 
+            var { operate, counts } = action.payload.data
+            var { last_action_at, counting_record_id } = operate
             var records = state.get("records")
-            for(let c in counts){
+            for (let c in counts) {
                 records = records.update(
                     records.findIndex(r => r.get("id") === c),
                     r => {
@@ -103,8 +110,15 @@ export function saveRecord(record) {
         payload: { record },
     }
 }
+export function changeDate(date) {
+    return {
+        type: CHANGE_DATE,
+        payload: {date},
+    }
+}
 export default {
     [OPERATING]: opReducer,
     [SAVE_RECORD]: opReducer,
     [REDISTRIBUTION_COMPLETE]: opReducer,
+    [CHANGE_DATE] : opReducer,
 }
