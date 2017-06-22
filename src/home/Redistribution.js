@@ -41,18 +41,17 @@ class Redistribution extends React.Component {
         clearInterval(this.timer)
     }
     handleComplete() {
-        let laa = this.props.gonextdate ? this.props.end_at : getTimestamp()
+        let laa = this.props.gonextdate ? this.props.at : getTimestamp()
         this.props.redistributionComplete({
             operate: {
                 last_action_at: laa, //todo
                 counting_record_id: "",
+                current_date : this.props.gonextdate,
             },
             counts: this.state.counts,
         })
         // change date here
-        if (this.props.gonextdate)
-            this.props.changeDate(this.props.gonextdate)
-        else
+        if (!this.props.gonextdate)
             this.props.onCancel()
     }
     handleRecordTime(r, v) {
@@ -69,12 +68,10 @@ class Redistribution extends React.Component {
         })
     }
     render() {
-        let { records, tasks, app, end_at,start_at } = this.props
+        let { records, tasks, app, end_at,start_at,at } = this.props
         return (<div style={styles}>
-            {start_at + '-' + end_at+' '}<br />
-            {new Date(start_at) + '-' + new Date(end_at)+' '}<br />
-            {moment(start_at).format("YYYY/MM/DD HH:mm:SS") + '-' + moment(end_at).format("HH:mm:SS") + ' '}
-            {!this.props.gonextdate?<a onClick={this.props.onCancel}>(x)</a>:<a />}
+            at:{moment(at).format("YYYY/MM/DD HH:mm:SS")}<br />
+            {moment(start_at).format("YYYY/MM/DD HH:mm:SS") + '-' + moment(end_at).format("HH:mm:SS") + ' '}<br />
             <br />
             {this.props.remaining + this.state.diff_re_at - Object.values(this.state.counts).reduce((a, b) => a + b, 0)}: remaining
             <br /><hr />
@@ -91,6 +88,7 @@ class Redistribution extends React.Component {
             <br /><hr />
             <a onClick={this.props.addtask}>(addtask)</a>
             <a onClick={this.handleComplete}>(complete)</a>
+            {!this.props.gonextdate?<a onClick={this.props.onCancel}>(close)</a>:<a />}
         </div>)
     }
 }

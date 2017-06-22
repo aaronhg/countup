@@ -9,10 +9,13 @@ import FontIcon from 'material-ui/FontIcon'
 import Task from './Task'
 import Redistribution from './Redistribution'
 import { getTimestamp, toSecs } from '../utils/id'
+import { fromJS } from 'immutable'
+import { saveAs } from 'file-saver'
 import AddTask from './AddTask'
+import DayGoTo from './DayGoTo'
 import moment from 'moment'
 function getStat(props, force) {
-    debugger
+    // debugger
     var isOver = function () {
         return working_end_at < now && now < working_last_at
     }
@@ -34,88 +37,79 @@ function getStat(props, force) {
     let date = props.date.get("date")
     let d = new Date(date)
     let now = getTimestamp()
-    let last_action_at = props.app.get("last_action_at")
+    let last_action_at = isNaN(Number(props.app.get("last_action_at"))) ? 0 : Number(props.app.get("last_action_at"))
     let counting_record_id = props.app.get("counting_record_id")
 
     let working_first_at = d.getTime()
-    let working_start_at = d.setHours(props.user.get("working_start_at"))
-    let working_end_at = d.setHours(props.user.get("working_end_at"))
+    let working_start_at = isNaN(Number(props.user.get("working_start_at")))? 0:d.setHours(props.user.get("working_start_at"))
+    let working_end_at = isNaN(Number(props.user.get("working_end_at"))) ? 0:d.setHours(props.user.get("working_end_at"))
     let working_last_at = d.setHours(24)
     let doTrigger = false
-    let start_at
-    let end_at
-    let remaining
-    let at
-    let docount
-    let nextdate
+    let start_at, end_at, at, remaining, docount, gonextdate
+    debugger
+    start_at = isActionThatDay() ? last_action_at : working_start_at
     if (force) {
+        at = now
         doTrigger = true
-        start_at = isActionThatDay() ? last_action_at : working_start_at
         end_at = now
         remaining = diff(end_at, start_at)
         docount = true
-    } else if (now > working_last_at) { // 換天了
+    } else if (now > working_last_at && last_action_at < working_last_at) { // 換天了
+        at = working_last_at
         doTrigger = true
-        start_at = isActionThatDay() ? last_action_at : working_start_at
         end_at = working_end_at
         remaining = Math.max(diff(end_at, start_at), workhrdiff())
         docount = false
-        nextdate = moment(working_last_at).format('YYYY/MM/DD')
-    } else if (isOver() && (isCounting() || workhrdiff() > 0)) { // 工作結束及時數不滿
+        gonextdate = moment(working_last_at).format('YYYY/MM/DD')
+    } else if (isOver() && workhrdiff() > 0) { // 工作結束及時數不滿
+    // } else if ( isOver() && isCounting() &&  + idle 30 min)
         doTrigger = true
-        start_at = isActionThatDay() ? last_action_at : working_start_at
+        at = now
         end_at = working_end_at
         remaining = Math.max(diff(end_at, start_at), workhrdiff())
         docount = false
-    // } else if (isWorking() && isActionThatDay() && !isCounting()) { + idle 30 min
-    //     doTrigger = true
-    //     start_at = last_action_at
-    //     end_at = now
-    //     remaining = diff(end_at, start_at)
-    //     docount = true
+        // } else if (isWorking() && isActionThatDay() && !isCounting()) { + idle 30 min
+        //     doTrigger = true
+        //     start_at = last_action_at
+        //     end_at = now
+        //     remaining = diff(end_at, start_at)
+        //     docount = true
     } else if (isWorking() && !isActionThatDay() && !isCounting()) {
+        at = now
         doTrigger = true
         start_at = working_start_at
         end_at = now
         remaining = diff(end_at, start_at)
         docount = true
     }
-    at = now
     if (!doTrigger)
-        return {
-            redistribution_at: 0,
-            redistribution_start_at: 0,
-            redistribution_end_at: 0,
-            redistribution_remaining: 0,
-            redistribution_docount: false,
-            redistribution_gonextdate: '',
-        }
+        return { at: 0 }
     return {
-        redistribution_at: at,
-        redistribution_start_at: start_at,
-        redistribution_end_at: end_at,
-        redistribution_remaining: remaining,
-        redistribution_docount: docount,
-        redistribution_gonextdate: nextdate,
+        at: at,
+        start_at: isActionThatDay() ? last_action_at : working_start_at,
+        end_at: end_at,
+        remaining: remaining,
+        docount: docount,
+        gonextdate: gonextdate,
     }
 }
-
 class Home extends React.Component {
     constructor(props) {
         super()
         // this.shift = this.shift.bind(this)
         this.redistribution = this.redistribution.bind(this)
+        this.downloadJSON = this.downloadJSON.bind(this)
         var stat = getStat(props)
         this.state = {
             currentIdx: props.app.get("counting_record_id") || 0,
             addtask: false,
-            ...stat,
+            redistribution: stat,
         }
     }
     componentDidMount() {
         // this.timer = setInterval(() => {
         //     var stat = getStat(this.props)
-        //     if (stat.redistribution_at) {
+        //     if (stat.at) {
         //         this.setState(stat)
         //     }
         // // }, 600000) // 每 10 分鐘 check 一次
@@ -130,7 +124,9 @@ class Home extends React.Component {
     componentWillReceiveProps(nextProps) {
         // 處理換天
         var stat = getStat(nextProps)
-        this.setState(stat)
+        this.setState({
+            redistribution: stat,
+        })
     }
     // shift(n) {
     //     this.setState({
@@ -139,24 +135,64 @@ class Home extends React.Component {
     // }
     redistribution() {
         var stat = getStat(this.props, true)
-        this.setState(stat)
+        this.setState({
+            redistribution: stat,
+        })
+    }
+    downloadJSON(){
+        let date = this.props.date.toJS()
+        let user_c = this.props.user.get("custom")
+        let user = user_c? user_c.toJS() : {}
+        let records = this.props.records.toJS()
+        let tasks = this.props.tasks.toJS()
+        date = {
+            ...date.custom,
+            value:date.date,
+        }
+        let obj = {
+            user,
+            date,
+            records:records.map(r=>{
+                r.task = tasks[r.ref_task_id]
+                delete r.meta
+                delete r.id
+                delete r.date
+                delete r.ref_task_id
+                delete r.task.meta
+                delete r.task.id
+                delete r.update_at
+                return r
+            }),
+            download_at : getTimestamp(),
+        }
+        let txt = JSON.stringify(obj)
+        let blob = new Blob([txt], {type: "application/json;charset=utf-8"});
+        saveAs(blob, date.value+".json");
     }
     render() {
         let { records, tasks, app } = this.props
         let date = this.props.date.get("date")
         let len = records.size
         let cr = records.get(this.state.currentIdx) || records.get(0)
-
+        let last_action_at = isNaN(Number(this.props.app.get("last_action_at"))) ? 0 : Number(this.props.app.get("last_action_at"))
+        let d = new Date(date)
+        let working_last_at = d.setHours(24)
+        let past
+        if (last_action_at >= working_last_at){
+            past = true
+        }
         // let idx = records.indexOf(currentRecord)
         // let len = records.length
         // let rightList = records.slice(idx + 1, len/2 + len%2 )
         // let leftList = records.slice(idx - len-1, len/2 - 1)
 
         return (<div>
-            {date}
-            <FontIcon className="material-icons" >more_vert</FontIcon>
-            <br /><hr />
-            <div>
+            <DayGoTo maxDate={new Date()} onSelectDay={this.props.homeActions.changeDate} /> {date}
+            <FontIcon onClick={this.downloadJSON} className="material-icons" >file_download</FontIcon>
+            <hr />
+            {
+               !past?
+               <div>
                 {/*len >= 2 ?
                     <div>
                         <FontIcon className="material-icons" onClick={() => this.shift(-1)}>chevron_left</FontIcon>
@@ -166,32 +202,32 @@ class Home extends React.Component {
                 */}
                 <div>
                     <FontIcon onClick={this.redistribution} className="material-icons" >format_line_spacing</FontIcon>
-                    {cr ? <Task type="mini" {...this.props.homeActions} key={cr.get("id")} task={tasks.get(cr.get("ref_task_id"))} record={cr} app={app} />
+                    {cr ? <Task type={past?"readonly":"mini"} {...this.props.homeActions} key={cr.get("id")} task={tasks.get(cr.get("ref_task_id"))} record={cr} app={app} />
                         : ""
                     }
                 </div>
-            </div>
-            <br /><hr />
+            </div>:
+                <div />
+            }
+            <hr />
             tasks:{records.filter(r => !tasks.get(r.get("ref_task_id")).get("done")).map((r) =>
-                <Task type="mini" {...this.props.homeActions} key={r.get("id")} task={tasks.get(r.get("ref_task_id"))} record={r} app={app} />
+                <Task type={past?"readonly":"mini"} {...this.props.homeActions} key={r.get("id")} task={tasks.get(r.get("ref_task_id"))} record={r} app={app} />
             )}
             dones:{records.filter(r => tasks.get(r.get("ref_task_id")).get("done")).map((r) =>
-                <Task type="mini" {...this.props.homeActions} key={r.get("id")} task={tasks.get(r.get("ref_task_id"))} record={r} app={app} />
+                <Task type={past?"readonly":"mini"} {...this.props.homeActions} key={r.get("id")} task={tasks.get(r.get("ref_task_id"))} record={r} app={app} />
             )}
             <br /><hr />
-            <a onClick={() => this.setState({ addtask: true })} >(addtask)</a>
-
+            { !past?
+                <a onClick={() => this.setState({ addtask: true })} >(addtask)</a>
+                : <a />
+            }
             {
-                this.state.redistribution_at ?
+                this.state.redistribution.at ?
                     <Redistribution onCancel={() => this.setState({
-                        redistribution_at: 0,
+                        redistribution: { at: 0 },
                     })}
                         {...this.props.homeActions}
-                        start_at={this.state.redistribution_start_at}
-                        end_at={this.state.redistribution_end_at}
-                        remaining={this.state.redistribution_remaining}
-                        docount={this.state.redistribution_docount}
-                        gonextdate={this.state.redistribution_gonextdate}
+                        {...this.state.redistribution}
                         tasks={tasks}
                         records={records}
                         app={app}
@@ -209,6 +245,7 @@ class Home extends React.Component {
                         onCancel={() => this.setState({
                             addtask: false,
                         })}
+                        date={date}
                         records={records} /> :
                     <div />
             }
@@ -220,12 +257,13 @@ Home.propTypes = {
     // records: PropTypes.arrayOf(PropTypes.object),
 }
 export default connect((state) => {
+    let current_date = state.app.get("app").get("current_date")
     return {
         app: state.app.get("app"),
         user: state.app.get("user"),
-        date: state.app.get("date"),
+        date: state.app.get("dates").filter(d => d.get("date") == current_date)[0] || fromJS({ date: current_date }),
         tasks: state.app.get("tasks"),
-        records: state.app.get("records"),
+        records: state.app.get("records").filter(r => r.get("date") == current_date),
     }
 }, (dispatch) => {
     return {

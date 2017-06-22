@@ -9,11 +9,11 @@ const CHANGE_DATE = "CHANGE_DATE"
 var opReducer = (state, action) => {
     switch (action.type) {
         case CHANGE_DATE:
-            debugger
             var { date } = action.payload
-            return state.set("date", fromJS({
-                date,
-            })).set("records", fromJS([]))
+            return state.set("app", fromJS({
+                ...state.get("app").toJS(),
+                current_date: date,
+            }))
         case SAVE_RECORD:
             var records = state.get("records")
             let { record } = action.payload
@@ -44,7 +44,7 @@ var opReducer = (state, action) => {
             return state
         case REDISTRIBUTION_COMPLETE:
             var { operate, counts } = action.payload.data
-            var { last_action_at, counting_record_id } = operate
+            var { last_action_at, counting_record_id, current_date } = operate
             var records = state.get("records")
             for (let c in counts) {
                 records = records.update(
@@ -56,8 +56,10 @@ var opReducer = (state, action) => {
             }
             state = state.set("records", records)
             return state.set("app", Map({
+                ...state.get("app").toJS(),
                 last_action_at,
                 counting_record_id,
+                current_date: current_date ? current_date : state.get("app").get("current_date")
             }))
         case OPERATING:
             var { last_action_at, counting_record_id, done } = action.payload.operate
@@ -84,6 +86,7 @@ var opReducer = (state, action) => {
                 }
             }
             return state.set("app", Map({
+                ...state.get("app").toJS(),
                 last_action_at,
                 counting_record_id,
             }))
@@ -113,12 +116,12 @@ export function saveRecord(record) {
 export function changeDate(date) {
     return {
         type: CHANGE_DATE,
-        payload: {date},
+        payload: { date },
     }
 }
 export default {
     [OPERATING]: opReducer,
     [SAVE_RECORD]: opReducer,
     [REDISTRIBUTION_COMPLETE]: opReducer,
-    [CHANGE_DATE] : opReducer,
+    [CHANGE_DATE]: opReducer,
 }

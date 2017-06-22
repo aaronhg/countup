@@ -47,15 +47,15 @@ class AddTask extends React.Component {
             )}
             <br /><hr />
             {task ? <p>{task.get("name") + "#" + task.get("id")}
-                <a onClick={() => this.handleCheckTask()}>(x)</a>
+                <a onClick={() => this.handleCheckTask()}>(remove)</a>
             </p> :
                 <div>
-                    tName:<input value={this.state.taskName} onChange={(e) => this.setState({ taskName: e.target.value })} /><br />
-                    tRefId:<input value={this.state.recordName} onChange={(e) => this.setState({ recordName: e.target.value })} /><br />
+                    task name:<input value={this.state.taskName} onChange={(e) => this.setState({ taskName: e.target.value })} /><br />
+                    task ref_id:<input value={this.state.taskRefId} onChange={(e) => this.setState({ taskRefId: e.target.value })} /><br />
                 </div>
             }
-            rRefId:<input value={this.state.recordRefId} onChange={(e) => this.setState({ recordRefId: e.target.value })} /><br />
-            <a onClick={this.handleAdd}>(addtask)</a>
+            record ref_id:<input value={this.state.recordRefId} onChange={(e) => this.setState({ recordRefId: e.target.value })} /><br />
+            <a onClick={this.handleAdd}>(add)</a>
             <a onClick={this.props.onCancel}>(cancel)</a>
         </div>)
     }

@@ -1,30 +1,32 @@
-import { Map, fromJS } from 'immutable'
+import { fromJS } from 'immutable'
 // initial state
-export default fromJS({
+var state1 = { 
     app: {
-        last_action_at: "1497928964586",
-        counting_record_id: "rywPU6EQZ",
+        last_action_at: "",
+        counting_record_id: "",
+        current_date : "2017/06/21",
     },
     user: {
-        // custom: {
-        //     ref_id,
-        //     system_key,
+        custom: {
+            ref_id:"H1HDUpVQu",
+            system_key:"H1HDUpVQs",
         //     field1,
         //     field2,
-        // },
+        },
         working_start_at: 8,
         working_end_at: 17,
+        // working_shift_zero:2 , //todo
         // update_at,
     },
-    date: {
+    dates: [{
         // custom: {
         //     memo,
         //     field1,
         //     field2,
         // },
-        date: "2017/6/20",
+        date: "2017/6/21",
         // update_at,
-    },
+    }],
     tasks: {'H1HDUpVQb':{
         // custom: {
         //     ref_id,
@@ -49,7 +51,8 @@ export default fromJS({
         id: 'H1HDUpVQ3',
         name: "task3",
     }},
-    records: [{
+    records: [
+    {
         // custom: {
         //     ref_id,
         //     memo,
@@ -80,4 +83,11 @@ export default fromJS({
         // }]
         // update_at,
     }],
+}
+export default fromJS({
+    app: {},
+    user: {},
+    dates: [],
+    tasks: {},
+    records: [],  
 })

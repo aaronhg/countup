@@ -1,11 +1,12 @@
 import 'babel-polyfill'
 import loki from 'lokijs'
 import LokiIndexedAdapter from '../../../node_modules/lokijs/src/loki-indexed-adapter'
-
+import moment from 'moment'
 var idbAdapter = new LokiIndexedAdapter()
 var db
 var loaded
-let colls = ["tags", "records", "items", "etags"]
+
+let colls = ["app","dates", "records", "tasks"]
 var setup = new Promise((res, rej) => {
     if (loaded)
         res(db)
@@ -18,7 +19,7 @@ var setup = new Promise((res, rej) => {
         loaded = true
         res(db)
     }
-    db = new loki("behobs.db", {
+    db = new loki("countup.db", {
         adapter: idbAdapter,
         autoload: true,
         autoloadCallback: databaseInitialize,
@@ -26,13 +27,32 @@ var setup = new Promise((res, rej) => {
         autosaveInterval: 4000,
     });
 })
+function arrayToMap(arr, kfn) {
+    return arr.reduce((obj, v) => {
+        obj[kfn(v)] = v
+        return obj
+    }
+        , {})
+}
 var getAll = new Promise((res, rej) => {
     var fn = () => {
         var truely = () => true
         res(colls.map(coll => [coll, db.getCollection(coll)])
             .map(([n, c]) => [n, c.where(truely)])
             .reduce(function (acc, cur, i) {
-                acc[cur[0]] = cur[1];
+                let coll = cur[0]
+                if (coll == "tasks") {
+                    acc[coll] = arrayToMap(cur[1], (v) => v.id)
+                } else if (coll == "app") {
+                    acc.app = cur[1].filter(v => v.key == "app")[0] || { key: "app" }
+                    if (!acc.app.last_action_at) {
+                        let today = moment().format("YYYY/MM/DD")
+                        acc.app.current_date = today
+                    }
+                    acc.user = cur[1].filter(v => v.key == "user")[0] || { key: "user" ,working_start_at:8,working_end_at:17} //todo
+                } else {
+                    acc[coll] = cur[1];
+                }
                 return acc;
             }, {}))
     }
@@ -40,11 +60,19 @@ var getAll = new Promise((res, rej) => {
 })
 var saveAll = async function (data) {
     await setup
-    colls.map(coll => [data[coll], db.getCollection(coll)])
-        .map(([ds, c]) => {
-            ds.map((d) => {
-                d.$loki && c.get(d.$loki) ? c.update(d) : c.insert(d)
-            })
+    colls.map(coll => [coll, data[coll], db.getCollection(coll)])
+        .map(([coll, ds, c]) => {
+            if (coll == "app") {
+                // debugger
+                ds = [data["app"], data["user"]]
+            }
+            if (coll == "tasks") {
+                ds = Object.values(ds)
+            }
+            if (ds)
+                ds.map((d) => {
+                    d.$loki && c.get(d.$loki) ? c.update(d) : c.insert(d)
+                })
         })
     db.save()
 }

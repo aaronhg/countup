@@ -2,11 +2,7 @@ export const LOAD_DATA = "LOAD_DATA"
 function rootReducer(state, action) {
     switch (action.type) {
         case LOAD_DATA:
-            let { data } = action.payload
-            return {
-                ...state,
-                ...data,
-            }
+            return action.payload.data
         default:
             return state
     }

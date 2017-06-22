@@ -36,10 +36,18 @@ class Task extends React.Component {
         if (this.props.type=="mini")
             return (<div>
                     <Counting start={(record.get("duration") || 0) + (isCounting ?diff:0)} do={isCounting} />
-                    {isCounting ? <FontIcon className="material-icons" onClick={this.stop}>pause_circle_outline</FontIcon> :<FontIcon className="material-icons" onClick={this.play}>play_circle_outline</FontIcon>}
+                    {isCounting ? <span><FontIcon className="material-icons" onClick={this.stop}>pause_circle_outline</FontIcon>
+                                  <FontIcon className="material-icons" onClick={this.done}>done</FontIcon></span> :
+                                  <span><FontIcon className="material-icons" onClick={this.play}>play_circle_outline</FontIcon></span>}
                     {task.get("name")}
                     </div>
                     )
+        else if (this.props.type=="readonly"){
+            return (<div>
+                    {task.get("name")} , {record.get("duration")}
+                    </div>
+                    )
+        }   
         else 
             return (
                 <div>

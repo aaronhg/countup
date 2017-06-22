@@ -6,14 +6,15 @@ import dialogReducer from '../dialog/MemoDialogRedux'
 
 export default function configureStore() {
     // const store = applyMiddleware(ReduxLogger)(createStore)(combineReducers(rootReducer))
-    const store = createStore(
-        combineReducers({
+    const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+    const store = createStore(combineReducers({
             app: rootReducer,
             dialog: dialogReducer,
-        }),
-        applyMiddleware(
-            ReduxLogger,
-        )
-    )
+        }),  composeEnhancers(
+            applyMiddleware(
+                ReduxLogger,
+            )
+    ))
+
     return store
 }

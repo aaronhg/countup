@@ -12,6 +12,7 @@ import FlatButton from 'material-ui/FlatButton'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 var injectTapEventPlugin = require("react-tap-event-plugin")
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import { fromJS } from 'immutable'
 injectTapEventPlugin();
 import Snackbar from 'material-ui/Snackbar'
 
@@ -40,23 +41,32 @@ class Main extends React.Component {
         });
     };
     componentDidMount() {
-        // storage.getAll.then((data) => {
-        //     this.props.store.dispatch(loadData(data))
-        //     this.setState({
-        //         snackbarOpen: true,
-        //         snackbarMessage:"Loaded",
-        //     });
-        // })
+        let store = this.props.store
+        storage.getAll.then((data) => {
+            console.log(data)
+            this.props.store.dispatch(loadData(fromJS(data)))
+            this.setState({
+                snackbarOpen: true,
+                snackbarMessage:"Loaded",
+            });
+            store.subscribe(()=>{
+                storage.saveAll(store.getState().app.toJS()).then(() => {
+                    this.setState({
+                        snackbarOpen: true,
+                        snackbarMessage:"Saved",
+                    });
+                })
+            })
+        })
     }
     render() {
         return (<MuiThemeProvider muiTheme={getMuiTheme()}>
             <div>
                 <Home/>
-                
                 <Snackbar
                     open={this.state.snackbarOpen}
                     message={this.state.snackbarMessage}
-                    autoHideDuration={4000}
+                    autoHideDuration={3000}
                     onRequestClose={this.handleRequestClose}
                 />
             </div>
