@@ -1,16 +1,16 @@
-import React from 'react'
+import React from "react"
 class Counting extends React.Component {
     constructor(props) {
-        super()
+        super(props)
         this.state = {
-            count: props.start,
+            count: props.diff || 0,
         }
     }
     componentWillReceiveProps(nextProps) {
         this.setState({
-            count: nextProps.start
+            count: nextProps.diff || 0,
         })
-        if (!nextProps.do && this.timer){
+        if (!nextProps.do && this.timer) {
             clearInterval(this.timer)
             this.timer = null
         }
@@ -35,7 +35,7 @@ class Counting extends React.Component {
         clearInterval(this.timer)
     }
     render() {
-        return (<span>{this.state.count}</span>)
+        return (<span>{this.props.start} {this.props.do ? <span style={{ color: "red" }}>+ {this.state.count}</span> : <span />}</span>)
     }
 }
 

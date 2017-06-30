@@ -1,5 +1,5 @@
-// import indexdb from './storages/indexdbSimple'
-import lokijs from './storages/lokijs'
+// import indexdb from "./storages/indexdbSimple"
+import lokijs from "./storages/lokijs"
 
 // version
 // test

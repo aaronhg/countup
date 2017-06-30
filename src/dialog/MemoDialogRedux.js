@@ -7,7 +7,6 @@ var initialState = {
 }
 // reducer
 export default (state=initialState, action) => {
-    
     switch (action.type) {
         case OPEN_MEMO_DIALOG:
             return {
@@ -31,7 +30,7 @@ export function openMemoDialog(record) {
         payload: record,
     }
 }
-export function closeMemoDialog(day) {
+export function closeMemoDialog() {
     return {
         type: CLOSE_MEMO_DIALOG,
     }

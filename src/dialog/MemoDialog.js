@@ -1,10 +1,10 @@
-import React from 'react'
-import Dialog from 'material-ui/Dialog'
-import RaisedButton from 'material-ui/RaisedButton'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { getShortID, getTimestamp } from '../utils/id'
-// import * as dialogActions from './MemoDialogRedux'
+import React from "react"
+import Dialog from "material-ui/Dialog"
+import RaisedButton from "material-ui/RaisedButton"
+import { connect } from "react-redux"
+import { bindActionCreators } from "redux"
+import { getShortID, getTimestamp } from "../utils/id"
+// import * as dialogActions from "./MemoDialogRedux"
 
 class MemoDialog extends React.Component {
     constructor() {
@@ -73,10 +73,10 @@ export default connect((state) => {
     return {
         ...state.dialog,
         tags:state.app.etags.map(e=>({id:e.id,name:e.name})),
-    };
+    }
 }, (dispatch) => {
     return {
         saveRecord: bindActionCreators(listActions, dispatch).saveRecord,
         closeMemoDialog: bindActionCreators(dialogActions, dispatch).closeMemoDialog,
-    };
+    }
 })(MemoDialog)

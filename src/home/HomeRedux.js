@@ -1,5 +1,5 @@
-import { Map, fromJS } from 'immutable'
-import { toSecs } from '../utils/id'
+import { Map, fromJS } from "immutable"
+import { toSecs } from "../utils/id"
 // contants
 const REDISTRIBUTION_COMPLETE = "REDISTRIBUTION_COMPLETE"
 const SAVE_RECORD = "SAVE_RECORD"
@@ -66,7 +66,7 @@ var opReducer = (state, action) => {
             let records = state.get("records")
             let tasks = state.get("tasks")
             let id = state.get("app").get("counting_record_id")
-            if (id) {
+            if (id) { //todo : 重複資料了
                 let diff = toSecs(last_action_at) - toSecs(state.get("app").get("last_action_at"))
                 let tid
                 records = records.update(
