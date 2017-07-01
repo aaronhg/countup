@@ -72,4 +72,20 @@ class Redistribution extends React.Component {
         </div>)
     }
 }
-export default Redistribution
+Redistribution.propTypes = {
+
+}
+export default withRouter(connect((state, ownProps) => {
+    let app = state.app
+    let current_date = app.get("app").get("current_date")
+    return {
+        date: current_date,
+        tasks: app.get("tasks"),
+        records: app.get("records").filter(r => r.get("date") == current_date),
+        goBack: ownProps.history.length > 2? ownProps.history.goBack : () => ownProps.history.push("/"), // todo : 正確導向
+    }
+}, (dispatch) => {
+    return {
+        saveRecord: bindActionCreators(saveRecord, dispatch),
+    }
+})(Redistribution))

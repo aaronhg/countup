@@ -20,9 +20,10 @@ class Main extends React.Component {
         this.saveData = this.saveData.bind(this)
         this.handleRequestClose = this.handleRequestClose.bind(this)
         this.state = {
-            snackbarOpen : false,
-            snackbarMessage:"",
+            snackbarOpen: false,
+            snackbarMessage: "",
         }
+        // this.prevState
     }
     saveData() {
         // let data = this.props.store.getState().app
@@ -33,7 +34,7 @@ class Main extends React.Component {
         //     });
         // })
     }
-    handleRequestClose () {
+    handleRequestClose() {
         this.setState({
             snackbarOpen: false,
         })
@@ -44,15 +45,19 @@ class Main extends React.Component {
             this.props.store.dispatch(loadData(fromJS(data)))
             this.setState({
                 snackbarOpen: true,
-                snackbarMessage:"Loaded",
+                snackbarMessage: "Loaded",
             })
-            store.subscribe(()=>{
-                storage.saveAll(store.getState().app.toJS()).then(() => {
-                    this.setState({
-                        snackbarOpen: true,
-                        snackbarMessage:"Saved",
+            store.subscribe(() => {
+                let state = store.getState().app
+                if (this.prevState && state != this.prevState) {
+                    storage.saveAll(state.app.toJS()).then(() => {
+                        this.prevState = state
+                        this.setState({
+                            snackbarOpen: true,
+                            snackbarMessage: "Saved",
+                        })
                     })
-                })
+                }
             })
         })
     }
