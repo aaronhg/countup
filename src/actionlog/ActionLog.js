@@ -5,12 +5,12 @@ import { connect } from "react-redux"
 // import { getTimestamp, getShortID } from "../../utils/id"
 // import { fromJS } from "immutable"
 import { Link } from "react-router-dom"
+import { format } from "../utils/period"
 import moment from "moment"
 var StampLi = (props) => {
     let { s, task } = props
     return (<li>
-        @{moment(s.at).format("THH:mm:ssZ")}
-        <Link to={"/memo/stamp/" + s.id}>#</Link >
+        <Link to={"/memo/stamp/" + s.id}>@{moment(s.at).format("THH:mm:ss")}#</Link >
         {((s.prefix) || "") + " " + (task ? task.get("name") : "") + (s.memo || "")}
     </li >
     )
@@ -18,18 +18,18 @@ var StampLi = (props) => {
 var LogLi = (props) => {
     let { al, task } = props
     return <li>
-        @{moment(al.at).format("THH:mm:ssZ")}#
+        @{moment(al.at).format("THH:mm:ss")}#
         {
             (task ? task.get("name") : "") + ":" +
             (al.action_type || "") + "," +
-            (al.secs || "") + "(" +
-            (al.accumulate || "") + ")"
+            (al.secs ?format(al.secs): "") + "(" +
+            (al.accumulate ?format(al.accumulate): "") + ")"
         }
     </li >
 }
 function merge(als, ss) {
     let ms = [...als.toJS(), ...ss.toJS()]
-    return ms.sort((ma, mb) => ma.at < mb.at)
+    return ms.sort((ma, mb) => mb.at - ma.at)
 }
 class ActionLog extends React.Component {
     constructor(props) {

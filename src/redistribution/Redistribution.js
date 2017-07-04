@@ -5,12 +5,14 @@ import { Link } from "react-router-dom"
 import moment from "moment"
 import Counting from "../home/Counting"
 const styles = {
-    "position": "absolute",
+    position: "absolute",
     zIndex: "1",
-    top: 0,
+    top: "0px",
     backgroundColor: "lightgray",
     width: "100%",
-    height: "100%",
+    left: "0px",
+    paddingLeft: "5px",
+    minHeight: "100%",
 }
 class Redistribution extends React.Component {
     constructor(props) {

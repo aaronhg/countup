@@ -7,7 +7,7 @@ import * as homeActions from "./HomeRedux"
 // import * as dialogActions from "../dialog/MemoDialogRedux"
 import FontIcon2 from "material-ui/FontIcon"
 const fontStyles = {
-    fontSize: "32px",
+    fontSize: "36px",
 }
 var FontIcon = (props) => <FontIcon2 style={fontStyles} {...props} />
 import Task from "./Task"
@@ -23,8 +23,8 @@ import { Link } from "react-router-dom"
 // delete homeActions.default
 function getStat(props) {
     // debugger
-    var isOver = function () {
-        return working_end_at < now && now < working_last_at
+    var isOver = function (at) {
+        return working_end_at < at && at < working_last_at
     }
     var isCounting = function () {
         return !!counting_record_id
@@ -77,7 +77,7 @@ function getStat(props) {
         remaining = diffFn(end_at, start_at)
         diff = diffFn(now, end_at)
         docount = true
-    } else if (isOver() && workhrdiff() > 0) { // 工作結束及時數不滿
+    } else if (isOver(now) && !isOver(last_action_at) && workhrdiff() > 0) { // 工作結束及時數不滿
         // } else if ( isOver() && isCounting() &&  + idle 30 min)
         doTrigger = true
         at = now
@@ -216,7 +216,7 @@ class Home extends React.Component {
                 <Link to="/addtask"><FontIcon className="material-icons" >add_circle_outline</FontIcon></Link>
                 : <a />
             }
-            <a onClick={this.handleStamp}>(make a stamp)</a>
+            <a style={{ float: "right" }} onClick={this.handleStamp}>(make a stamp)</a>
             <Link to="/actionlog"><FontIcon className="material-icons" >history</FontIcon></Link><br />
             memo:
             <Link to="/memo/date"><FontIcon className="material-icons" >date_range</FontIcon></Link>

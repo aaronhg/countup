@@ -5,8 +5,7 @@ import { getTimestamp, toSecs } from "../utils/id"
 import { format } from "../utils/period"
 import { Link } from "react-router-dom"
 const styles = {
-    width: "200px",
-    display: "inline-block",
+    float:"right",
 }
 class Task extends React.Component {
     constructor(props) {
@@ -49,24 +48,24 @@ class Task extends React.Component {
         let isCounting = record.get("id") == app.get("counting_record_id")
         let diff = toSecs(getTimestamp()) - toSecs(app.get("last_action_at"))
         if (this.props.type == "mini")
-            return (<div>
-                <span style={styles}>
-                    <Counting start={record.get("duration") || 0} diff={isCounting ? diff : 0} do={isCounting} />
-                </span>
-                {isCounting
-                    ? <FontIcon className="material-icons" onClick={this.stop}>pause_circle_outline</FontIcon>
-                    : <FontIcon className="material-icons" onClick={this.play}>play_circle_outline</FontIcon>
-                }
-                {isCounting
-                    ? <a onClick={this.pass}>(pass)</a>
-                    : <a />
-                }
-                {!record.get("done")
-                    ? <FontIcon className="material-icons" onClick={this.done}>done</FontIcon>
-                    : <a />
-                }
+            return (<div style={{height:40}}>
                 <Link to={"/memo/task/"+task.get("id")}>{task.get("name")}</Link>
-                <Link to={"/memo/record/"+record.get("id")}>@T</Link>
+                <Link to={"/memo/record/"+record.get("id")}> @T</Link>
+                <Counting start={record.get("duration") || 0} diff={isCounting ? diff : 0} do={isCounting} />
+                <span style={styles}>
+                    {isCounting
+                        ? <FontIcon className="material-icons" onClick={this.stop}>pause_circle_outline</FontIcon>
+                        : <FontIcon className="material-icons" onClick={this.play}>play_circle_outline</FontIcon>
+                    }
+                    {isCounting
+                        ? <a onClick={this.pass}>(pass)</a>
+                        : <a />
+                    }
+                    {!record.get("done")
+                        ? <FontIcon className="material-icons" onClick={this.done}>done</FontIcon>
+                        : <a />
+                    }
+                </span>
             </div>
             )
         else if (this.props.type == "readonly") {

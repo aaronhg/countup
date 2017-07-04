@@ -58,12 +58,11 @@ class TimeButtor extends React.Component {
         this.props.onTimeChanged(this.state.count - this.props.count % 3600 + m * 60)
     }
     render() {
-        // todo : 負值時呈現錯誤
+        // hr <input type="number" value={Math.floor(this.state.count/3600)} onChange={(e)=>this.handleHrChange(e.target.value)}/>
+        // min <input type="number" value={Math.floor((this.state.count%3600)/60)} onChange={(e)=>this.handleMinChange(e.target.value)}/>
         return (
             <div>
                 <span style={{ color: "red" }}>{format(this.state.count)}</span><br />
-                hr <input type="number" value={Math.floor(this.state.count/3600)} onChange={(e)=>this.handleHrChange(e.target.value)}/>
-                min <input type="number" value={Math.floor((this.state.count%3600)/60)} onChange={(e)=>this.handleMinChange(e.target.value)}/>
                 <div onClick={this.handleChange}>
                     {hrButtons.map(
                         v => <span key={v.val} data-v={v.val}>({v.txt})</span>
