@@ -2,7 +2,7 @@ import React from "react"
 import { Route, Link } from "react-router-dom"
 
 import Home from "../home/Home"
-
+import FontIcon from "material-ui/FontIcon"
 import { loadData } from "./MainRedux"
 import storage from "../utils/storage"
 // import MemoDialog from "../dialog/MemoDialog"
@@ -20,12 +20,14 @@ import MemoDate from "../memo/date/MemoDate"
 import MemoRecord from "../memo/record/MemoRecord"
 import MemoTask from "../memo/task/MemoTask"
 import MemoUser from "../memo/user/MemoUser"
+import { saveAs } from "file-saver"
 let prevState
 class Main extends React.Component {
     constructor() {
         super()
         this.saveData = this.saveData.bind(this)
         this.handleRequestClose = this.handleRequestClose.bind(this)
+        this.downloadAll = this.downloadAll.bind(this)
         this.state = {
             snackbarOpen: false,
             snackbarMessage: "",
@@ -68,9 +70,15 @@ class Main extends React.Component {
             })
         })
     }
+    downloadAll(){
+        let store = this.props.store
+        let blob = new Blob([JSON.stringify(store.getState().app.toJS(), (k, v) => ~["$loki", "meta"].indexOf(k) ? undefined : v)], { type: "application/json;charset=utf-8" })
+        saveAs(blob, "export.json")
+    }
     render() {
         return (<MuiThemeProvider muiTheme={getMuiTheme()}>
             <div>
+                <Route exact path="/" render={()=><a style={{float:"right"}} onClick={this.downloadAll}><FontIcon className="material-icons" >file_download</FontIcon>all</a>} />
                 <div>
                     <Route exact path="/" component={Home} />
                     <Route path="/addtask" component={AddTask} />

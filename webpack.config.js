@@ -2,7 +2,7 @@ var path = require("path")
 var HtmlwebpackPlugin = require("html-webpack-plugin")
 var ROOT_PATH = path.resolve(__dirname)
 var APP_PATH = path.resolve(ROOT_PATH, "src")
-var BUILD_PATH = path.resolve(ROOT_PATH, "docs/demo")
+var BUILD_PATH = path.resolve(ROOT_PATH, "build")
 
 module.exports = {
     // devtool: "cheap-module-eval-source-map",
