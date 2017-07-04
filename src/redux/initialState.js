@@ -92,7 +92,7 @@ var state1 = {
     //     ref_task_id,
     //     memo,
     // }],
-    // action_logs:[{
+    // actionlog:[{
     //     at,
     //     ref_task_id,
     //     action_type,//(start,pause,done,distribution,cancel)
@@ -108,5 +108,5 @@ export default fromJS({
     tasks: {},
     records: [],
     stamps: [],
-    // action_logs: [],
+    actionlog: [],
 })

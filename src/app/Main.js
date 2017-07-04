@@ -57,7 +57,6 @@ class Main extends React.Component {
             store.subscribe(() => {
                 let state = store.getState().app
                 if (prevState && state != prevState) {
-                    debugger
                     storage.saveAll(prevState, state).then(() => {
                         prevState = state
                         this.setState({

@@ -20,8 +20,8 @@ class MemoUser extends React.Component {
             system_key: custom ? custom.get("system_key") : "",
             field1: custom ? custom.get("field1") : "",
             field2: custom ? custom.get("field2") : "",
-            working_start_at: user.get("working_start_at") ? d1 : "",
-            working_end_at: user.get("working_end_at") ? d2 : "",
+            working_start_at: user.get("working_start_at") ? d1 : undefined,
+            working_end_at: user.get("working_end_at") ? d2 : undefined,
             working_hours: user.get("working_hours") || "",
         }
     }

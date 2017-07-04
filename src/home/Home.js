@@ -5,7 +5,11 @@ import PropTypes from "prop-types"
 
 import * as homeActions from "./HomeRedux"
 // import * as dialogActions from "../dialog/MemoDialogRedux"
-import FontIcon from "material-ui/FontIcon"
+import FontIcon2 from "material-ui/FontIcon"
+const fontStyles = {
+    fontSize: "32px",
+}
+var FontIcon = (props) => <FontIcon2 style={fontStyles} {...props} />
 import Task from "./Task"
 // import Redistribution from "./Redistribution"
 import { getTimestamp, toSecs, getShortID } from "../utils/id"
@@ -16,6 +20,7 @@ import Redistribution from "../redistribution/Redistribution"
 import DayGoTo from "./DayGoTo"
 import moment from "moment"
 import { Link } from "react-router-dom"
+// delete homeActions.default
 function getStat(props) {
     // debugger
     var isOver = function () {
@@ -48,14 +53,14 @@ function getStat(props) {
     d = new Date(date)
     let working_start_at = isNaN(Number(props.user.get("working_start_at"))) ? working_first_at : d.setHours(props.user.get("working_start_at"))
     let working_end_at = isNaN(Number(props.user.get("working_end_at"))) ? working_last_at : d.setHours(props.user.get("working_end_at"))
-    let working_hours = isNaN(Number(props.user.get("working_hours"))) ?  ((working_end_at - working_start_at) / 1000) : props.user.get("working_hours") * 3600
+    let working_hours = isNaN(Number(props.user.get("working_hours"))) ? ((working_end_at - working_start_at) / 1000) : props.user.get("working_hours") * 3600
 
     let doTrigger = false
     let start_at, end_at, at, remaining, docount, gonextdate, closable = true
     let diff
     start_at = isThatDay(last_action_at) ? last_action_at : working_start_at
-    debugger
-    //todo trigger 很多次，看是否可以減少
+    // debugger
+    // todo trigger 很多次，看是否可以減少
     if (now > working_last_at && last_action_at < working_last_at) { // 換天了
         at = working_last_at
         doTrigger = true
@@ -187,7 +192,7 @@ class Home extends React.Component {
         let working_last_at = d.setHours(24)
         let past = (last_action_at >= working_last_at) ? true : false
         return (<div>
-            <DayGoTo maxDate={new Date()} onSelectDay={homeActions.changeDate} /> {date}
+            <DayGoTo maxDate={new Date()} onSelectDay={homeActions.changeDate} /> {date.get("date")}
             <FontIcon onClick={this.downloadJSON} className="material-icons" >file_download</FontIcon>
             <hr />
             {
@@ -208,13 +213,14 @@ class Home extends React.Component {
             />
             <br /><hr />
             {!past ?
-                <Link to="/addtask">(addtask)</Link>
+                <Link to="/addtask"><FontIcon className="material-icons" >add_circle_outline</FontIcon></Link>
                 : <a />
             }
             <a onClick={this.handleStamp}>(make a stamp)</a>
-            <Link to="/actionlog">(see stamps)</Link><br />
-            <Link to="/memo/date">(memo date)</Link>
-            <Link to="/memo/user">(memo user)</Link>
+            <Link to="/actionlog"><FontIcon className="material-icons" >history</FontIcon></Link><br />
+            memo:
+            <Link to="/memo/date"><FontIcon className="material-icons" >date_range</FontIcon></Link>
+            <Link to="/memo/user"><FontIcon className="material-icons" >face</FontIcon></Link>
             {
                 this.state.redistribution.at ?
                     <Redistribution
@@ -238,7 +244,7 @@ export default connect((state) => {
     return {
         app: state.app.get("app"),
         user: state.app.get("user"),
-        date: state.app.get("dates").filter(d => d.get("date") == current_date)[0] || fromJS({ date: current_date }), //todo
+        date: state.app.get("dates").find(d => d.get("date") == current_date) || fromJS({ date: current_date }), //todo
         tasks: state.app.get("tasks"),
         records: state.app.get("records").filter(r => r.get("date") == current_date),
     }

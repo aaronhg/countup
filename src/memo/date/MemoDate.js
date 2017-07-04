@@ -28,6 +28,7 @@ class MemoStamp extends React.Component {
                 memo: this.state.memo,
             },
             date: this.props.datetxt,
+            id: date.id || getShortID(),
             update_at: getTimestamp(),
         })
         this.props.goBack()

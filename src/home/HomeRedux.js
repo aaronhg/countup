@@ -1,6 +1,6 @@
 import { Map, fromJS } from "immutable"
 import { push } from "react-router-redux"
-import { toSecs } from "../utils/id"
+import { toSecs,getShortID } from "../utils/id"
 // contants
 const REDISTRIBUTION_AT = "REDISTRIBUTION_AT"
 const REDISTRIBUTION_COMPLETE = "REDISTRIBUTION_COMPLETE"
@@ -122,15 +122,28 @@ var opReducer = (state, action) => {
             var { operate, counts } = action.payload.data
             var { last_action_at, counting_record_id, current_date } = operate
             var records = state.get("records")
+            var actionlog = state.get("actionlog")
             for (let c in counts) {
                 records = records.update(
                     records.findIndex(r => r.get("id") === c),
                     r => {
+                        actionlog = actionlog.push(fromJS({
+                            id : getShortID(),
+                            at: last_action_at,
+                            ref_task_id: r.get("ref_task_id"),
+                            date: r.get("date"),
+                            action_type: "distribution",
+                            secs: counts[c],
+                            accumulate: r.get("duration") + counts[c],
+                            update_at: last_action_at,
+                        }))
                         return r.set("duration", r.get("duration") + counts[c]).set("update_at", last_action_at)
                     }
                 )
             }
             state = state.set("records", records)
+            state = state.set("actionlog", actionlog)
+
             return state.set("app", Map({
                 ...state.get("app").toJS(),
                 last_action_at,
@@ -141,16 +154,40 @@ var opReducer = (state, action) => {
         case OPERATING:
             var { last_action_at, counting_record_id } = action.payload.operate
             var records = state.get("records")
+            var actionlog = state.get("actionlog")
             var id = state.get("app").get("counting_record_id")
-            if (id) { //todo : 重複資料了
+            if (id) {
                 let diff = toSecs(last_action_at) - toSecs(state.get("app").get("last_action_at"))
                 records = records.update(
                     records.findIndex(r => r.get("id") === id),
                     r => {
+                        actionlog = actionlog.push(fromJS({
+                            id : getShortID(),
+                            at: last_action_at,
+                            ref_task_id: r.get("ref_task_id"),
+                            date: r.get("date"),
+                            action_type: "pause",
+                            secs: diff,
+                            accumulate:r.get("duration") + diff,
+                            update_at: last_action_at,
+                        }))
                         return r.set("duration", r.get("duration") + diff).set("update_at", last_action_at)
                     }
                 )
                 state = state.set("records", records)
+                state = state.set("actionlog", actionlog)
+            }
+            if (counting_record_id) {
+                let tmpr = records.find(r => r.get("id") === counting_record_id)
+                actionlog = actionlog.push(fromJS({
+                    id : getShortID(),
+                    at: last_action_at,
+                    ref_task_id: tmpr.get("ref_task_id"),
+                    date: tmpr.get("date"),
+                    action_type: "start",
+                    update_at: last_action_at,
+                }))
+                state = state.set("actionlog", actionlog)
             }
             return state.set("app", Map({
                 ...state.get("app").toJS(),
