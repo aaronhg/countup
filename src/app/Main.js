@@ -13,7 +13,14 @@ injectTapEventPlugin()
 import { fromJS } from "immutable"
 import Snackbar from "material-ui/Snackbar"
 import AddTask from "../addtask/AddTask"
+import ActionLog from "../actionlog/ActionLog"
 import Redistribution from "../redistribution/Redistribution"
+import MemoStamp from "../memo/stamp/MemoStamp"
+import MemoDate from "../memo/date/MemoDate"
+import MemoRecord from "../memo/record/MemoRecord"
+import MemoTask from "../memo/task/MemoTask"
+import MemoUser from "../memo/user/MemoUser"
+let prevState
 class Main extends React.Component {
     constructor() {
         super()
@@ -23,7 +30,6 @@ class Main extends React.Component {
             snackbarOpen: false,
             snackbarMessage: "",
         }
-        // this.prevState
     }
     saveData() {
         // let data = this.props.store.getState().app
@@ -42,16 +48,18 @@ class Main extends React.Component {
     componentDidMount() {
         let store = this.props.store
         storage.getAll.then((data) => {
-            this.props.store.dispatch(loadData(fromJS(data)))
+            prevState = fromJS(data)
+            this.props.store.dispatch(loadData(prevState))
             this.setState({
                 snackbarOpen: true,
                 snackbarMessage: "Loaded",
             })
             store.subscribe(() => {
                 let state = store.getState().app
-                if (this.prevState && state != this.prevState) {
-                    storage.saveAll(state.app.toJS()).then(() => {
-                        this.prevState = state
+                if (prevState && state != prevState) {
+                    debugger
+                    storage.saveAll(prevState, state).then(() => {
+                        prevState = state
                         this.setState({
                             snackbarOpen: true,
                             snackbarMessage: "Saved",
@@ -67,11 +75,12 @@ class Main extends React.Component {
                 <div>
                     <Route exact path="/" component={Home} />
                     <Route path="/addtask" component={AddTask} />
-                    <Route path="/redistribution" component={Redistribution} />
-                    {/*<Route path="/memo/date/:id" component={TagsTag} />
-                    <Route path="/memo/task/:id" component={TagsETag} />
-                    <Route path="/memo/record/:id" component={TagsItem} />
-                    <Route path="/memo/stamp/:id" component={TagsItem} />*/}
+                    <Route path="/memo/user" component={MemoUser} />
+                    <Route path="/memo/record/:id" component={MemoRecord} />
+                    <Route path="/memo/task/:id" component={MemoTask} />
+                    <Route path="/memo/date" component={MemoDate} />
+                    <Route path="/memo/stamp/:id" component={MemoStamp} />
+                    <Route path="/actionlog" component={ActionLog} />
                 </div>
                 <Snackbar
                     open={this.state.snackbarOpen}

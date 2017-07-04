@@ -108,5 +108,5 @@ export default fromJS({
     tasks: {},
     records: [],
     stamps: [],
-    action_logs: [],
+    // action_logs: [],
 })

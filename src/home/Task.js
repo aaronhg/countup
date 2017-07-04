@@ -2,13 +2,19 @@ import React from "react"
 import Counting from "./Counting"
 import FontIcon from "material-ui/FontIcon"
 import { getTimestamp, toSecs } from "../utils/id"
-
+import { format } from "../utils/period"
+import { Link } from "react-router-dom"
+const styles = {
+    width: "200px",
+    display: "inline-block",
+}
 class Task extends React.Component {
     constructor(props) {
         super(props)
         this.stop = this.stop.bind(this)
         this.done = this.done.bind(this)
         this.play = this.play.bind(this)
+        this.pass = this.pass.bind(this)
     }
     stop() {
         this.props.doOperating({
@@ -17,16 +23,25 @@ class Task extends React.Component {
         })
     }
     done() {
-        this.props.doOperating({
-            counting_record_id: "",
-            last_action_at: getTimestamp(),
-            done: true,
-        })
+        let { record, app } = this.props
+        if (record.get("id") == app.get("counting_record_id")) {
+            this.stop()
+        }
+        this.props.recordDone(this.props.record.get("id"))
     }
     play() {
         this.props.doOperating({
             counting_record_id: this.props.record.get("id"),
             last_action_at: getTimestamp()
+        })
+    }
+    pass() {
+        this.props.redistributionComplete({
+            operate: {
+                last_action_at: this.props.app.get("last_action_at"),
+                counting_record_id: "",
+            },
+            counts: {},
         })
     }
     render() {
@@ -35,21 +50,28 @@ class Task extends React.Component {
         let diff = toSecs(getTimestamp()) - toSecs(app.get("last_action_at"))
         if (this.props.type == "mini")
             return (<div>
-                <Counting start={record.get("duration") || 0} diff={isCounting ? diff : 0} do={isCounting} />
+                <span style={styles}>
+                    <Counting start={record.get("duration") || 0} diff={isCounting ? diff : 0} do={isCounting} />
+                </span>
                 {isCounting
                     ? <FontIcon className="material-icons" onClick={this.stop}>pause_circle_outline</FontIcon>
                     : <FontIcon className="material-icons" onClick={this.play}>play_circle_outline</FontIcon>
+                }
+                {isCounting
+                    ? <a onClick={this.pass}>(pass)</a>
+                    : <a />
                 }
                 {!record.get("done")
                     ? <FontIcon className="material-icons" onClick={this.done}>done</FontIcon>
                     : <a />
                 }
-                {task.get("name")}
+                <Link to={"/memo/task/"+task.get("id")}>{task.get("name")}</Link>
+                <Link to={"/memo/record/"+record.get("id")}>@T</Link>
             </div>
             )
         else if (this.props.type == "readonly") {
             return (<div>
-                {task.get("name")} , {record.get("duration")}
+                {task.get("name")} , {format(record.get("duration"))}
             </div>
             )
         }

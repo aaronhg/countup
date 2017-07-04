@@ -1,12 +1,13 @@
 import 'babel-polyfill'
 import loki from 'lokijs'
 import LokiIndexedAdapter from '../../../node_modules/lokijs/src/loki-indexed-adapter'
+import { gett } from '../id'
 import moment from 'moment'
 var idbAdapter = new LokiIndexedAdapter()
 var db
 var loaded
 
-let colls = ["app","dates", "records", "tasks"]
+let colls = ["app", "dates", "records", "tasks", "stamps"]
 var setup = new Promise((res, rej) => {
     if (loaded)
         res(db)
@@ -31,8 +32,7 @@ function arrayToMap(arr, kfn) {
     return arr.reduce((obj, v) => {
         obj[kfn(v)] = v
         return obj
-    }
-        , {})
+    }, {})
 }
 var getAll = new Promise((res, rej) => {
     var fn = () => {
@@ -45,11 +45,11 @@ var getAll = new Promise((res, rej) => {
                     acc[coll] = arrayToMap(cur[1], (v) => v.id)
                 } else if (coll == "app") {
                     acc.app = cur[1].filter(v => v.key == "app")[0] || { key: "app" }
-                    if (!acc.app.last_action_at) {
+                    if (!acc.app.last_action_at) { // 第一次使用
                         let today = moment().format("YYYY/MM/DD")
                         acc.app.current_date = today
                     }
-                    acc.user = cur[1].filter(v => v.key == "user")[0] || { key: "user" ,working_start_at:8,working_end_at:17} //todo
+                    acc.user = cur[1].filter(v => v.key == "user")[0] || { key: "user" } //,working_start_at:8,working_end_at:17} //todo
                 } else {
                     acc[coll] = cur[1];
                 }
@@ -58,20 +58,29 @@ var getAll = new Promise((res, rej) => {
     }
     setup.then(fn)
 })
-var saveAll = async function (data) {
+var saveAll = async function (prev, data) {
     await setup
-    colls.map(coll => [coll, data[coll], db.getCollection(coll)])
-        .map(([coll, ds, c]) => {
+    colls.map(coll => [coll, [prev.get(coll), data.get(coll)], db.getCollection(coll)])
+        .map(([coll, [dp, dn], c]) => {
+            let ds = []
             if (coll == "app") {
-                // debugger
-                ds = [data["app"], data["user"]]
+                ds[ds.length] = [prev.get("app"), data.get("app")]
+                ds[ds.length] = [prev.get("user"), data.get("user")]
             }
             if (coll == "tasks") {
-                ds = Object.values(ds)
+                for (let k of dn.keys()) {
+                    ds[ds.length] = [dp.get(k), dn.get(k)]
+                }
             }
-            if (ds)
-                ds.map((d) => {
-                    d.$loki && c.get(d.$loki) ? c.update(d) : c.insert(d)
+            if (coll == "records" || coll == "stamps" || coll == "dates") {
+                ds = dn.map(d => [undefined, d]) // imm list , list.size
+            }
+            if (ds.length || ds.size)
+                ds.map((di) => {
+                    if (di[1] && di[0] !== di[1]) {
+                        let d = di[1].toJS()
+                        d.$loki && c.get(d.$loki) ? c.update(d) : c.insert(d)
+                    }
                 })
         })
     db.save()

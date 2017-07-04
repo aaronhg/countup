@@ -2,14 +2,28 @@ import React from 'react'
 import Task from "./Task"
 export default (props) => {
     return (<div>
-        {props.records.map((r) =>
+        tasks:
+        {props.records.filter(r => !r.get("done")).map((r) =>
             <Task key={r.get("id")}
                 type={props.past ? "readonly" : "mini"}
+                redistributionComplete={props.redistributionComplete}
                 doOperating={props.doOperating}
+                recordDone={props.recordDone}
                 task={props.tasks.get(r.get("ref_task_id"))}
                 record={r}
                 app={props.app}
             />)
         }
+        <hr />
+        dones:
+        {props.records.filter(r => r.get("done")).map((r) =>
+            <Task key={r.get("id")}
+                type={props.past ? "readonly" : "mini"}
+                redistributionComplete={props.redistributionComplete}
+                doOperating={props.doOperating}
+                task={props.tasks.get(r.get("ref_task_id"))}
+                record={r}
+                app={props.app}
+            />)}
     </div>)
 }

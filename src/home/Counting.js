@@ -1,4 +1,5 @@
 import React from "react"
+import { format } from "../utils/period"
 class Counting extends React.Component {
     constructor(props) {
         super(props)
@@ -35,7 +36,7 @@ class Counting extends React.Component {
         clearInterval(this.timer)
     }
     render() {
-        return (<span>{this.props.start} {this.props.do ? <span style={{ color: "red" }}>+ {this.state.count}</span> : <span />}</span>)
+        return (<span>{format(this.props.start)} {this.props.diff ? <span style={{ color: "red" }}>{format(this.state.count)}</span> : <span />}</span>)
     }
 }
 
