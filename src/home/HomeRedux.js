@@ -205,11 +205,11 @@ var opReducer = (state, action) => {
             )
             return state.set("records", records)
         case RECORD_ARCHIVE:
-            var { id } = action.payload
+            var { id, archived } = action.payload
             var records = state.get("records")
             records = records.update(
                 records.findIndex(r => r.get("id") === id),
-                t => t.set("archive", true)
+                t => t.set("archive", archived)
             )
             return state.set("records", records)
         case TASK_ARCHIVE:
@@ -285,10 +285,10 @@ export function recordDone(id) {
         payload: { id },
     }
 }
-export function recordArchive(id) {
+export function recordArchive(id, archived) {
     return {
         type: RECORD_ARCHIVE,
-        payload: { id },
+        payload: { id, archived },
     }
 }
 export function taskArchive(tid) {

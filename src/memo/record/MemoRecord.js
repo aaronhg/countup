@@ -7,10 +7,10 @@ import { updateRecord, recordArchive } from "../../home/HomeRedux"
 import FontIcon from "material-ui/FontIcon"
 import moment from "moment"
 const styles2 = {
-    float:"right",
+    float: "right",
 }
 const styles3 = {
-    float:"right",
+    float: "right",
     display: "none",
 }
 class MemoRecord extends React.Component {
@@ -41,8 +41,8 @@ class MemoRecord extends React.Component {
         })
         this.props.goBack()
     }
-    handleArchive(){
-        this.props.recordArchive(this.props.record.get("id"))
+    handleArchive() {
+        this.props.recordArchive(this.props.record.get("id"), true)
         this.props.goBack()
     }
     render() {
@@ -59,7 +59,7 @@ class MemoRecord extends React.Component {
             <hr />
             <a onClick={this.handleSave}>(update)</a>
             <a onClick={this.props.goBack}>(close)</a>
-            <FontIcon style={record.get("duration")?styles3:styles2} onClick={this.handleArchive} className="material-icons" >delete</FontIcon>
+            <FontIcon style={record.get("duration") ? styles3 : styles2} onClick={this.handleArchive} className="material-icons" >delete</FontIcon>
         </div>) :
             (<div>
                 record not exists
