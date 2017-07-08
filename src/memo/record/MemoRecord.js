@@ -3,12 +3,21 @@ import { withRouter } from "react-router-dom"
 import { connect } from "react-redux"
 import { bindActionCreators } from "redux"
 import { getTimestamp, getShortID } from "../../utils/id"
-import { updateRecord } from "../../home/HomeRedux"
+import { updateRecord, recordArchive } from "../../home/HomeRedux"
+import FontIcon from "material-ui/FontIcon"
 import moment from "moment"
+const styles2 = {
+    float:"right",
+}
+const styles3 = {
+    float:"right",
+    display: "none",
+}
 class MemoRecord extends React.Component {
     constructor(props) {
         super(props)
         this.handleSave = this.handleSave.bind(this)
+        this.handleArchive = this.handleArchive.bind(this)
         let custom = props.record && props.record.get("custom")
         this.state = {
             ref_id: custom ? custom.get("ref_id") : "",
@@ -23,7 +32,7 @@ class MemoRecord extends React.Component {
             ...record,
             custom: {
                 ...record.custom,
-                ref_id:this.state.ref_id,
+                ref_id: this.state.ref_id,
                 field1: this.state.field1,
                 field2: this.state.field2,
                 memo: this.state.memo,
@@ -32,9 +41,13 @@ class MemoRecord extends React.Component {
         })
         this.props.goBack()
     }
+    handleArchive(){
+        this.props.recordArchive(this.props.record.get("id"))
+        this.props.goBack()
+    }
     render() {
         let { record, task } = this.props
-        let name = task ?task.get("name"):""
+        let name = task ? task.get("name") : ""
         return record ? (<div>
             task : {name}<br />
             at : {record.get("date")}<br />
@@ -45,7 +58,8 @@ class MemoRecord extends React.Component {
             field2:<input value={this.state.field2} onChange={(e) => this.setState({ field2: e.target.value })} /><br />
             <hr />
             <a onClick={this.handleSave}>(update)</a>
-            <a onClick={this.props.goBack}>(close)</a><br />
+            <a onClick={this.props.goBack}>(close)</a>
+            <FontIcon style={record.get("duration")?styles3:styles2} onClick={this.handleArchive} className="material-icons" >delete</FontIcon>
         </div>) :
             (<div>
                 record not exists
@@ -65,5 +79,6 @@ export default withRouter(connect((state, ownProps) => {
 }, (dispatch) => {
     return {
         updateRecord: bindActionCreators(updateRecord, dispatch),
+        recordArchive: bindActionCreators(recordArchive, dispatch),
     }
 })(MemoRecord))

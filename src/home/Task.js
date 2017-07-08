@@ -48,7 +48,7 @@ class Task extends React.Component {
         let isCounting = record.get("id") == app.get("counting_record_id")
         let diff = toSecs(getTimestamp()) - toSecs(app.get("last_action_at"))
         if (this.props.type == "mini")
-            return (<div style={{height:40}}>
+            return (<div style={{minHeight:"40px"}}>
                 <Link to={"/memo/task/"+task.get("id")}>{task.get("name")}</Link>
                 <Link to={"/memo/record/"+record.get("id")}> @T</Link>
                 <Counting start={record.get("duration") || 0} diff={isCounting ? diff : 0} do={isCounting} />

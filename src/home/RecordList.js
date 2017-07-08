@@ -1,9 +1,10 @@
 import React from 'react'
 import Task from "./Task"
 export default (props) => {
+    let records = props.records.filter(r => !r.get("archive"))
     return (<div>
         tasks:
-        {props.records.filter(r => !r.get("done")).map((r) =>
+        {records.filter(r => !r.get("done")).map((r) =>
             <Task key={r.get("id")}
                 type={props.past ? "readonly" : "mini"}
                 redistributionComplete={props.redistributionComplete}
@@ -16,7 +17,7 @@ export default (props) => {
         }
         <hr />
         dones:
-        {props.records.filter(r => r.get("done")).map((r) =>
+        {records.filter(r => r.get("done")).map((r) =>
             <Task key={r.get("id")}
                 type={props.past ? "readonly" : "mini"}
                 redistributionComplete={props.redistributionComplete}

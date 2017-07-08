@@ -1,6 +1,6 @@
 import { Map, fromJS } from "immutable"
 import { push } from "react-router-redux"
-import { toSecs,getShortID } from "../utils/id"
+import { toSecs, getShortID } from "../utils/id"
 // contants
 const REDISTRIBUTION_AT = "REDISTRIBUTION_AT"
 const REDISTRIBUTION_COMPLETE = "REDISTRIBUTION_COMPLETE"
@@ -9,6 +9,7 @@ const OPERATING = "OPERATING"
 const CHANGE_DATE = "CHANGE_DATE"
 const SAVE_STAMP = "SAVE_STAMP"
 const RECORD_DONE = "RECORD_DONE"
+const RECORD_ARCHIVE = "RECORD_ARCHIVE"
 const TASK_ARCHIVE = "TASK_ARCHIVE"
 const UPDATE_REOCRD = "UPDATE_REOCRD"
 const UPDATE_TASK = "UPDATE_TASK"
@@ -128,7 +129,7 @@ var opReducer = (state, action) => {
                     records.findIndex(r => r.get("id") === c),
                     r => {
                         actionlog = actionlog.push(fromJS({
-                            id : getShortID(),
+                            id: getShortID(),
                             at: last_action_at,
                             ref_task_id: r.get("ref_task_id"),
                             date: r.get("date"),
@@ -162,13 +163,13 @@ var opReducer = (state, action) => {
                     records.findIndex(r => r.get("id") === id),
                     r => {
                         actionlog = actionlog.push(fromJS({
-                            id : getShortID(),
+                            id: getShortID(),
                             at: last_action_at,
                             ref_task_id: r.get("ref_task_id"),
                             date: r.get("date"),
                             action_type: "pause",
                             secs: diff,
-                            accumulate:r.get("duration") + diff,
+                            accumulate: r.get("duration") + diff,
                             update_at: last_action_at,
                         }))
                         return r.set("duration", r.get("duration") + diff).set("update_at", last_action_at)
@@ -180,7 +181,7 @@ var opReducer = (state, action) => {
             if (counting_record_id) {
                 let tmpr = records.find(r => r.get("id") === counting_record_id)
                 actionlog = actionlog.push(fromJS({
-                    id : getShortID(),
+                    id: getShortID(),
                     at: last_action_at,
                     ref_task_id: tmpr.get("ref_task_id"),
                     date: tmpr.get("date"),
@@ -201,6 +202,14 @@ var opReducer = (state, action) => {
             records = records.update(
                 records.findIndex(r => r.get("id") === id),
                 t => t.set("done", true)
+            )
+            return state.set("records", records)
+        case RECORD_ARCHIVE:
+            var { id } = action.payload
+            var records = state.get("records")
+            records = records.update(
+                records.findIndex(r => r.get("id") === id),
+                t => t.set("archive", true)
             )
             return state.set("records", records)
         case TASK_ARCHIVE:
@@ -276,6 +285,12 @@ export function recordDone(id) {
         payload: { id },
     }
 }
+export function recordArchive(id) {
+    return {
+        type: RECORD_ARCHIVE,
+        payload: { id },
+    }
+}
 export function taskArchive(tid) {
     return {
         type: TASK_ARCHIVE,
@@ -304,4 +319,5 @@ export default {
     [UPDATE_TASK]: opReducer,
     [UPDATE_DATE]: opReducer,
     [UPDATE_USER]: opReducer,
+    [RECORD_ARCHIVE]: opReducer,
 }

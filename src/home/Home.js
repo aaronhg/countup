@@ -240,7 +240,8 @@ Home.propTypes = {
     // records: PropTypes.arrayOf(PropTypes.object),
 }
 export default connect((state) => {
-    let current_date = state.app.get("app").get("current_date")
+    let app = state.app
+    let current_date = app.get("app").get("current_date")
     return {
         app: state.app.get("app"),
         user: state.app.get("user"),

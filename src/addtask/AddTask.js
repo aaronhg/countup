@@ -4,12 +4,13 @@ import { connect } from "react-redux"
 import { bindActionCreators } from "redux"
 import { getTimestamp, getShortID } from "../utils/id"
 import TaskList from "./TaskList"
-import { saveRecord } from "../home/HomeRedux"
+import { saveRecord, taskArchive } from "../home/HomeRedux"
 class AddTask extends React.Component {
     constructor(props) {
         super(props)
         this.handleAdd = this.handleAdd.bind(this)
         this.handleCheckTask = this.handleCheckTask.bind(this)
+        this.handleArchiveTask = this.handleArchiveTask.bind(this)
         this.state = {
             taskName: "",
         }
@@ -32,11 +33,14 @@ class AddTask extends React.Component {
             task,
         })
     }
+    handleArchiveTask(task) {
+        this.props.taskArchive(task.get("id"))
+    }
     render() {
         let { tasks, records } = this.props
         let { task } = this.state
         return (<div>
-            <TaskList tasks={tasks} records={records} handleCheckTask={this.handleCheckTask} />
+            <TaskList task={task} tasks={tasks} records={records} handleCheckTask={this.handleCheckTask} handleArchiveTask={this.handleArchiveTask}/>
             <hr />
             {
                 task ?
@@ -67,10 +71,11 @@ export default withRouter(connect((state, ownProps) => {
         date: current_date,
         tasks: app.get("tasks"),
         records: app.get("records").filter(r => r.get("date") == current_date),
-        goBack: ownProps.history.length > 2? ownProps.history.goBack : () => ownProps.history.push("/"), // todo : 正確導向
+        goBack: ownProps.history.length > 2 ? ownProps.history.goBack : () => ownProps.history.push("/"), // todo : 正確導向
     }
 }, (dispatch) => {
     return {
         saveRecord: bindActionCreators(saveRecord, dispatch),
+        taskArchive: bindActionCreators(taskArchive, dispatch),
     }
 })(AddTask))
