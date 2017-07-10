@@ -101,7 +101,7 @@ class Redistribution extends React.Component {
                         from: {moment(start_at).format()}<br />
                         to  : {moment(end_at).format()}<br />
                         <br />
-                        <span><Counting start={remaining} diff={diff} do={false} /> : remaining</span>
+                        <span><Counting showStart={true} start={remaining} diff={diff} do={false} /> : remaining</span>
                         <br /><hr />
                         <RecordList records={records} tasks={tasks} counts={counts} handleRecordTime={this.handleRecordTime} />
                         <br /><hr />

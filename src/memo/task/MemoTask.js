@@ -14,6 +14,7 @@ class MemoTask extends React.Component {
             field1: custom ? custom.get("field1") : "",
             field2: custom ? custom.get("field2") : "",
             memo: custom ? custom.get("memo") : "",
+            notification_mins: props.task && props.task.get("notification_mins") || "",
         }
     }
     handleSave() {
@@ -27,6 +28,7 @@ class MemoTask extends React.Component {
                 field2: this.state.field2,
                 memo: this.state.memo,
             },
+            notification_mins: this.state.notification_mins,
             update_at: getTimestamp(),
         })
         this.props.goBack()
@@ -41,6 +43,8 @@ class MemoTask extends React.Component {
             memo:<input value={this.state.memo} onChange={(e) => this.setState({ memo: e.target.value })} /><br />
             field1:<input value={this.state.field1} onChange={(e) => this.setState({ field1: e.target.value })} /><br />
             field2:<input value={this.state.field2} onChange={(e) => this.setState({ field2: e.target.value })} /><br />
+            <hr />
+            notification_mins:<input type="number" value={this.state.notification_mins} onChange={(e) => this.setState({ notification_mins: e.target.value })} /><br />
             <hr />
             <a onClick={this.handleSave}>(update)</a>
             <a onClick={this.props.goBack}>(close)</a><br />

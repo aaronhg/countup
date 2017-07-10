@@ -13,8 +13,8 @@ class MemoUser extends React.Component {
         let custom = user && user.get("custom")
         var d1 = new Date(),
             d2 = new Date()
-        d1.setHours(user.get("working_start_at"),0,0,0)
-        d2.setHours(user.get("working_end_at"),0,0,0)
+        d1.setHours(user.get("working_start_at"), 0, 0, 0)
+        d2.setHours(user.get("working_end_at"), 0, 0, 0)
         this.state = {
             ref_id: custom ? custom.get("ref_id") : "",
             system_key: custom ? custom.get("system_key") : "",
@@ -23,6 +23,7 @@ class MemoUser extends React.Component {
             working_start_at: user.get("working_start_at") ? d1 : undefined,
             working_end_at: user.get("working_end_at") ? d2 : undefined,
             working_hours: user.get("working_hours") || "",
+            default_notification_mins: user.get("default_notification_mins"),
         }
     }
     handleSave() {
@@ -47,6 +48,7 @@ class MemoUser extends React.Component {
             working_start_at: wsa > wea ? wea : wsa,
             working_end_at: wsa > wea ? wsa : wea,
             working_hours: this.state.working_hours,
+            default_notification_mins: this.state.default_notification_mins,
             update_at: getTimestamp(),
         })
         this.props.goBack()
@@ -64,6 +66,8 @@ class MemoUser extends React.Component {
             start_at:<TimePicker minutesStep={60} format="24hr" autoOk={true} value={this.state.working_start_at} onChange={(e, d) => this.setState({ working_start_at: d })} />
             end_at:<TimePicker minutesStep={60} format="24hr" autoOk={true} value={this.state.working_end_at} onChange={(e, d) => this.setState({ working_end_at: d })} />
             hours:<input type="number" value={this.state.working_hours} onChange={(e) => this.setState({ working_hours: e.target.value })} /><br />
+            <hr />
+            default Notification mins:<input type="number" value={this.state.default_notification_mins} onChange={(e) => this.setState({ default_notification_mins: e.target.value })} /><br />
             <hr />
             <a onClick={this.handleSave}>(update)</a>
             <a onClick={this.props.goBack}>(close)</a><br />

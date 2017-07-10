@@ -16,7 +16,7 @@ const UPDATE_TASK = "UPDATE_TASK"
 const UPDATE_DATE = "UPDATE_DATE"
 const UPDATE_USER = "UPDATE_USER"
 // reducer
-var opReducer = (state, action) => {
+var homeReducer = (state, action) => {
     switch (action.type) {
         case SAVE_STAMP:
             var { stamp } = action.payload
@@ -307,17 +307,17 @@ export function redistributionAt(at) {
     }
 }
 export default {
-    [OPERATING]: opReducer,
-    [SAVE_RECORD]: opReducer,
-    [REDISTRIBUTION_COMPLETE]: opReducer,
-    [CHANGE_DATE]: opReducer,
-    [SAVE_STAMP]: opReducer,
-    [RECORD_DONE]: opReducer,
-    [TASK_ARCHIVE]: opReducer,
-    [REDISTRIBUTION_AT]: opReducer,
-    [UPDATE_REOCRD]: opReducer,
-    [UPDATE_TASK]: opReducer,
-    [UPDATE_DATE]: opReducer,
-    [UPDATE_USER]: opReducer,
-    [RECORD_ARCHIVE]: opReducer,
+    [OPERATING]: homeReducer,
+    [SAVE_RECORD]: homeReducer,
+    [REDISTRIBUTION_COMPLETE]: homeReducer,
+    [CHANGE_DATE]: homeReducer,
+    [SAVE_STAMP]: homeReducer,
+    [RECORD_DONE]: homeReducer,
+    [TASK_ARCHIVE]: homeReducer,
+    [REDISTRIBUTION_AT]: homeReducer,
+    [UPDATE_REOCRD]: homeReducer,
+    [UPDATE_TASK]: homeReducer,
+    [UPDATE_DATE]: homeReducer,
+    [UPDATE_USER]: homeReducer,
+    [RECORD_ARCHIVE]: homeReducer,
 }

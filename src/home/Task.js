@@ -51,7 +51,7 @@ class Task extends React.Component {
             return (<div style={{minHeight:"40px"}}>
                 <Link to={"/memo/task/"+task.get("id")}>{task.get("name")}</Link>
                 <Link to={"/memo/record/"+record.get("id")}> @T</Link>
-                <Counting start={record.get("duration") || 0} diff={isCounting ? diff : 0} do={isCounting} />
+                <Counting showStart={true} start={record.get("duration") || 0} diff={isCounting ? diff : 0} do={isCounting} />
                 <span style={styles}>
                     {isCounting
                         ? <FontIcon className="material-icons" onClick={this.stop}>pause_circle_outline</FontIcon>

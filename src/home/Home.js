@@ -18,9 +18,13 @@ import { saveAs } from "file-saver"
 import RecordList from "./RecordList"
 import Redistribution from "../redistribution/Redistribution"
 import DayGoTo from "./DayGoTo"
+import Notify from "./Notify" 
 import moment from "moment"
 import { Link } from "react-router-dom"
 // delete homeActions.default
+var diffFn = function (end_at, start_at) {
+    return toSecs(end_at) - toSecs(start_at)
+}
 function getStat(props) {
     // debugger
     var isOver = function (at) {
@@ -37,10 +41,7 @@ function getStat(props) {
     }
     var workhrdiff = function () {
         return working_hours - props.records.reduce((c, r) => c + r.get("duration"), 0)
-    }
-    var diffFn = function (end_at, start_at) {
-        return toSecs(end_at) - toSecs(start_at)
-    }
+    } 
     let date = props.date.get("date")
     let d = new Date(date)
     let now = getTimestamp()
@@ -124,15 +125,14 @@ class Home extends React.Component {
         this.state = {
             redistribution: getStat(props),
         }
+        Notification.requestPermission(function (status) {
+            // This allows to use Notification.permission with Chrome/Safari
+            if (Notification.permission !== status) {
+                Notification.permission = status
+            }
+        })
     }
     componentDidMount() {
-        // this.timer = setInterval(() => {
-        //     var stat = getStat(this.props)
-        //     if (stat.at) {
-        //         this.setState(stat)
-        //     }
-        // // }, 600000) // 每 10 分鐘 check 一次
-        // }, 5000) // 每 10 分鐘 check 一次
     }
     componentWillUnmount() {
     }
@@ -186,11 +186,14 @@ class Home extends React.Component {
         saveAs(blob, date.value + ".json")
     }
     render() {
-        let { records, tasks, app, homeActions, date } = this.props
+        let { records, tasks, app, homeActions, date ,user} = this.props
         let last_action_at = isNaN(Number(app.get("last_action_at"))) ? 0 : Number(app.get("last_action_at"))
+        let default_notification_mins = isNaN(Number(user.get("default_notification_mins"))) ? 0 : Number(user.get("default_notification_mins"))
         let d = new Date(date.get("date"))
         let working_last_at = d.setHours(24)
         let past = (last_action_at >= working_last_at) ? true : false
+        let counting_record_id = app.get("counting_record_id")
+        let task_notification_mins = counting_record_id && tasks.get(records.find(r=>r.get("id")==counting_record_id).get("ref_task_id")).get("notification_mins")
         return (<div>
             <DayGoTo maxDate={new Date()} onSelectDay={homeActions.changeDate} /> {date.get("date")}
             <FontIcon onClick={this.downloadJSON} className="material-icons" >file_download</FontIcon>
@@ -199,6 +202,11 @@ class Home extends React.Component {
                 !past ?
                     <div>
                         <span onClick={this.redistribution}>(<FontIcon className="material-icons">format_line_spacing</FontIcon>redistribution)</span>
+                        {
+                            counting_record_id?
+                                <Notify last_action_at={last_action_at} default_notification_mins={default_notification_mins} task_notification_mins={task_notification_mins}/>:
+                                <div />
+                        }
                     </div> :
                     <div />
             }

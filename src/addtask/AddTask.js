@@ -34,9 +34,16 @@ class AddTask extends React.Component {
         }
         this.props.goBack()
     }
+    componentWillReceiveProps(nextProps) {
+        this.setState({
+            task: null,
+            record: null,
+        })
+    }
     handleCheckTask(task) {
         this.setState({
             task,
+            record: null,
         })
     }
     handleCheckRecord(record) {
@@ -54,7 +61,7 @@ class AddTask extends React.Component {
         let tmp
         return (<div>
             <TaskList task={task} tasks={tasks} records={records} handleCheckTask={this.handleCheckTask} handleArchiveTask={this.handleArchiveTask} />
-            <RecordList record={record} tasks={tasks} records={records} handleCheckRecord={this.handleCheckRecord} handleArchiveTask={this.handleArchiveTask} />
+            <RecordList record={record} tasks={tasks.filter(t => !t.get("archive"))} records={records.filter(r => r.get("archive"))} handleCheckRecord={this.handleCheckRecord} handleArchiveTask={this.handleArchiveTask} />
             <hr />
             {
                 task ?
@@ -70,7 +77,7 @@ class AddTask extends React.Component {
             {
                 record ?
                     <div>
-                        {(tmp = record.get("custom")) ? tmp.get("ref_id") : ""} <a onClick={() => this.handleCheckRecord()}>(remove)</a>
+                        #{(tmp = record.get("custom")) ? tmp.get("ref_id") : ""} <a onClick={() => this.handleCheckRecord()}>(remove)</a>
                     </div> :
                     <div>
                         record ref_id:<input value={this.state.recordRefId} onChange={(e) => this.setState({ recordRefId: e.target.value })} /><br />

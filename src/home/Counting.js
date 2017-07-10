@@ -10,6 +10,7 @@ class Counting extends React.Component {
     componentWillReceiveProps(nextProps) {
         this.setState({
             count: nextProps.diff || 0,
+            doneA:false,
         })
         if (!nextProps.do && this.timer) {
             clearInterval(this.timer)
@@ -26,8 +27,16 @@ class Counting extends React.Component {
     componentDidMount() {
         if (this.props.do) {
             this.timer = setInterval(() => {
+                let count = this.state.count + 1
+                let floor = this.props.doAWhenReach
+                let doneA = this.state.doneA
+                if (floor && !doneA&& count >= floor) {
+                    this.props.doA && this.props.doA()
+                    doneA = true
+                }
                 this.setState({
-                    count: this.state.count + 1,
+                    count,
+                    doneA,
                 })
             }, 1000)
         }
@@ -36,8 +45,18 @@ class Counting extends React.Component {
         clearInterval(this.timer)
     }
     render() {
-        return (<span>{format(this.props.start)} {this.props.diff ? <span style={{ color: "red" }}>{format(this.state.count)}</span> : <span />}</span>)
+        let s = (this.props.prefix?this.props.prefix:"") + (this.props.showStart ? format(this.props.start) : "")
+        return (<span>{s} {this.props.diff ? <span style={{ color: "red" }}>{format(this.state.count)}</span> : <span />}</span>)
     }
 }
-
+Counting.propTypes = {
+    // do,
+    // doAWhenReach,
+    // doA,
+    // diff,
+    // showStart,
+    // start,
+    // prefix,
+    // count,//state
+}
 export default Counting

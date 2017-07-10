@@ -12,6 +12,8 @@ export default (props) => {
     return (<div>
         {records.map(r => {
             let t = tasks.get(r.get("ref_task_id"))
+            if ( !t)
+                return <div key={r.get("id")} />
             return (
                 <div style={record == r ? styles : Object.prototype} key={r.get("id")}>
                     <span onClick={() => props.handleCheckRecord(r)}>{t.get("name")}</span>
