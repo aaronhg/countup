@@ -19,30 +19,19 @@ class Notify extends React.Component {
         })
     }
     notification() {
-        let msg = this.state.reach+" mins reached"
-        if (Notification && Notification.permission === "granted") {
-            new Notification(msg)
-        }
-        else if (Notification && Notification.permission !== "denied") {
-            Notification.requestPermission(function (status) {
-                if (Notification.permission !== status) {
-                    Notification.permission = status
-                }
-                if (status === "granted") {
-                    new Notification(msg)
-                }
-                else {
-                    alert(msg)
-                }
-            })
-        }
-        else {
-            alert(msg)
+        let msg = this.state.reach + " mins reached"
+        if (Notification) {
+            if (Notification && Notification.permission === "granted") {
+                new Notification(msg)
+            }
+            else {
+                alert(msg)
+            }
         }
     }
     render() {
         let { reach } = this.state
-        let diff = diffFn(+new Date(),this.props.last_action_at)
+        let diff = diffFn(+new Date(), this.props.last_action_at)
         let reachSecs = reach * 60
         return (<div>
             <Counting prefix="counting:"
@@ -54,7 +43,7 @@ class Notify extends React.Component {
                 doA={this.notification}
             />
             {" "}alert when reach<input
-                style={{width: "30px"}}
+                style={{ width: "30px" }}
                 type="number"
                 value={this.state.reach}
                 onChange={(e) => this.setState({ reach: e.target.value })}

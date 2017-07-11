@@ -125,12 +125,13 @@ class Home extends React.Component {
         this.state = {
             redistribution: getStat(props),
         }
-        Notification.requestPermission(function (status) {
-            // This allows to use Notification.permission with Chrome/Safari
-            if (Notification.permission !== status) {
-                Notification.permission = status
-            }
-        })
+        if (Notification){
+            Notification.requestPermission(function (status) {
+                if (Notification.permission !== status) {
+                    Notification.permission = status
+                }
+            })
+        }
     }
     componentDidMount() {
     }

@@ -27,7 +27,9 @@ class Main extends React.Component {
         super()
         this.saveData = this.saveData.bind(this)
         this.handleRequestClose = this.handleRequestClose.bind(this)
-        this.downloadAll = this.downloadAll.bind(this)
+        this.export = this.export.bind(this)
+        this.import = this.import.bind(this)
+        this.exportText = this.exportText.bind(this)
         this.state = {
             snackbarOpen: false,
             snackbarMessage: "",
@@ -70,15 +72,41 @@ class Main extends React.Component {
             })
         })
     }
-    downloadAll(){
+    exportText(){
+        storage.getAll.then((data) => {
+            document.body.innerText = JSON.stringify(data)
+        })
+    }
+    export() {
         let store = this.props.store
         let blob = new Blob([JSON.stringify(store.getState().app.toJS(), (k, v) => ~["$loki", "meta"].indexOf(k) ? undefined : v)], { type: "application/json;charset=utf-8" })
         saveAs(blob, "export.json")
     }
+    import() {
+        var file = document.getElementById("file1")
+        file.onchange = () => {
+            var reader = new FileReader()
+            reader.onload = () => {
+                var text = reader.result
+                storage.clearAll()
+                this.props.store.dispatch(loadData(fromJS(JSON.parse(text))))
+            }
+            reader.readAsText(document.getElementById("file1").files[0])
+        }
+        file.click()
+    }
     render() {
         return (<MuiThemeProvider muiTheme={getMuiTheme()}>
             <div>
-                <Route exact path="/" render={()=><a style={{float:"right"}} onClick={this.downloadAll}><FontIcon className="material-icons" >file_download</FontIcon>all</a>} />
+                <Route exact path="/" render={() => <a style={{ float: "right" }} onClick={this.export}><FontIcon className="material-icons" >file_download</FontIcon>all</a>} />
+                <Route exact path="/export" render={() => <a style={{ float: "right" }} onClick={this.export}><FontIcon className="material-icons" >file_download</FontIcon>export</a>} />
+                <Route exact path="/export_text" render={() => <a style={{ float: "right" }} onClick={this.exportText}><FontIcon className="material-icons" >file_download</FontIcon>export text</a>} />
+                <Route exact path="/import" render={() => {
+                    return (<div>
+                        <a style={{ float: "right" }} onClick={this.import}><FontIcon className="material-icons" >file_upload</FontIcon>import(will replace data)</a>
+                        <input type="file" id="file1" style={{ display: "none" }} />
+                    </div>)
+                }} />
                 <div>
                     <Route exact path="/" component={Home} />
                     <Route path="/addtask" component={AddTask} />

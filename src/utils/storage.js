@@ -16,10 +16,11 @@ import lokijs from "./storages/lokijs"
 // setup and update
 var getAll = lokijs.getAll
 var saveAll = lokijs.saveAll
-
+var clearAll = lokijs.clearAll
 // setup(setup)
 
 export default {
     getAll,
-    saveAll
+    saveAll,
+    clearAll,
 }

@@ -59,6 +59,13 @@ var getAll = new Promise((res, rej) => {
     }
     setup.then(fn)
 })
+var clearAll = async function () {
+    await setup
+    colls.map((coll) => {
+        db.removeCollection(coll)
+        db.addCollection(coll, { unique: ["id"] })
+    })
+}
 var saveAll = async function (prev, data) {
     await setup
     colls.map(coll => [coll, [prev.get(coll), data.get(coll)], db.getCollection(coll)])
@@ -101,4 +108,5 @@ var saveAll = async function (prev, data) {
 export default {
     saveAll,
     getAll,
+    clearAll,
 }
